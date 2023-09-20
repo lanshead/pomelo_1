@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    {{ super() }}
+{% for cat, msg in get_flashed_messages(True) %}
+    <div class="flash {{ cat }}">{{ msg }}</div>
+{% endfor %}
+
+<form id='Form' action="{{ url_for('addTask') }}" method="post" class="form-contact">
+<p><label>Название задания: </label><input type="text" name="task_name" value="" required />
+<!-- Выбор отчета. Наименования выгружаются из БД -->
+<p><label>Название отчета: </label><select type="text" name="report_name" id="" required>
+    <option selected disabled>Название отчета</option>
+    {% for obj in reports %}
+    <option>{{ obj.filename }}</option>
+    {% endfor %}
+</select>
+
+<!-- Выбор форматавремени действия из доступных для выбранного отчета.
+Изначально все поля скрыты, видимым становится то, которое соответствует выбранному отчету -->
+<p id="hide1_format" style="display: block"><label>Формат действия: </label><select  type="text" name="format_action1" required>
+    <option selected disabled>Формат отчета</option>
+    <option>Один раз</option>
+    <option>Ежедневно</option>
+    <option>Интервал</option>
+</select>
+<p id="hide2_format" style="display: none"><label>Формат действия: </label><select  type="text" name="format_action2" required>
+    <option selected disabled>Формат отчета</option>
+    <option>Один раз</option>
+</select>
+<p id="hide3_format" style="display: none"><label>Формат действия: </label><select  type="text" name="format_action3" required>
+    <option selected disabled>Формат отчета</option>
+    <option>Ежедневно</option>
+    <option>Интервал</option>
+</select>
+
+<!-- Выбор времени и/или даты, в зависимости от выбранного формата -->
+<p id="hide1_time" style="display: block"><label>Выполнить: </label><input type="date" name="time_action" /> <label> в :</label><input type="time" name="time_action" required/>
+<p id="hide2_time" style="display: none"><label>Каждый день в: </label><input type="time" name="time_action" required/>
+<p id="hide3_time" style="display: none"><label>Выберите временной интервал: </label><input type="time" name="time_action" required/>
+
+<p><input type="submit" value="Создать задачу" />
+</form>
+
+<!-- Серия if/else JS-скрипта, отображающий блоки в зависимости от заполняемых полей отчета, действия и времени -->
+<script type="text/javascript">
+    Form.report_name.addEventListener('change', function(e){
+        if(e.target.value === 'test1')
+            {% include 'test.html' %}
+    })
+
+
+
+//    Form.report_name.addEventListener('change', function(e){
+//        if(e.target.value === 'test1')
+//        {hide1_format.style.display = 'block';
+//        Form.format_action1.addEventListener('change', function(e){
+//        if (hide1_format.style.display === 'block')
+//            if(e.target.value === 'Один раз')
+//                hide1_time.style.display = 'block';
+//            else
+//                hide1_time.style.display = 'none';
+//            if(e.target.value === 'Ежедневно')
+//                hide2_time.style.display = 'block';
+//            else
+//                hide2_time.style.display = 'none';
+//            if(e.target.value === 'Интервал')
+//                hide3_time.style.display = 'block';
+//            else
+//                hide3_time.style.display = 'none';
+//
+//    })
+//        }
+//        else
+//            hide1_format.style.display = 'none';
+//
+//
+//        if(e.target.value === 'test2')
+//        {hide2_format.style.display = 'block';
+//        Form.format_action2.addEventListener('change', function(e){
+//            if (hide2_format.style.display === 'block')
+//                hide2_time.style.display = 'block';
+//            else
+//                hide2_time.style.display = 'none';
+//    })
+//        }
+//        else
+//            hide2_format.style.display = 'none';
+//
+//
+//        if(e.target.value === 'test3')
+//        {hide3_format.style.display = 'block';
+//        Form.format_action3.addEventListener('change', function(e){
+//        if (hide3_format.style.display === 'block')
+//            if(e.target.value === 'Ежедневно')
+//                hide2_time.style.display = 'block';
+//            else
+//                hide2_time.style.display = 'none';
+//            if(e.target.value === 'Интервал')
+//            {hide3_time.style.display = 'block';
+//                hide1_time.style.display = 'none';}
+//            else
+//                hide3_time.style.display = 'none';
+//    })
+//        }
+//        else
+//            hide3_format.style.display = 'none';
+//    })
+
+
+
+</script>
+{% endblock %}

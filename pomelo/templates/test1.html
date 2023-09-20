@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    {{ super() }}
+{% for cat, msg in get_flashed_messages(True) %}
+    <div class="flash {{ cat }}">{{ msg }}</div>
+{% endfor %}
+
+{% if count_pos %}
+    <p>output: {{ count_pos }}</p>
+{% endif %}
+
+
+
+{% endblock %}

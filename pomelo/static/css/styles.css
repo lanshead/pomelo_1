@@ -1,0 +1,18 @@
+.flash {padding: 10px;}
+.flash.success {
+         border: 1px solid #21DB56;
+         background: #AEFFC5;
+}
+.flash.error {
+         border: 1px solid #FF4343;
+         background: #FF9C9C;
+}
+
+table {
+    width: 100%;border-collapse: collapse;
+}
+td, th {
+    border: 1px solid #333;padding: 3px;
+}
+col { border-left: 4px double #333; }
+col:first-child { border-left-width: 1px; }

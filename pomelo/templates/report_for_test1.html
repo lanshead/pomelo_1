@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    {{ super() }}
+
+{% for cat, msg in get_flashed_messages(True) %}
+    <div class="flash {{ cat }}">{{ msg }}</div>
+{% endfor %}
+    <h3>Форма задачи: "{{ session['task_name'] }}".</h3>
+<form action="" method="POST" class="form-contact">
+{{ form.hidden_tag() }}
+{{ form.user.label() }} {{ form.user() }}<br>
+{{ form.usr_pass.label() }} {{ form.usr_pass() }}<br>
+{{ form.db_adress.label() }} {{ form.db_adress() }}<br>
+{{ form.db_login.label() }} {{ form.db_login() }}<br>
+{{ form.db_pass.label() }} {{ form.db_pass() }}<br>
+{{ form.db_name.label() }} {{ form.db_name() }}<br>
+{{ form.rp_descr.label() }} {{ form.rp_descr }}<br>
+{{ form.time_interval.label() }}{{ form.time_interval() }}<br>
+{{ form.dt_begin.label() }} {{ form.tm_begin() }} {{ form.dt_begin() }}<br>
+{{ form.dt_end.label() }} {{ form.tm_end() }} {{ form.dt_end() }}<br>
+{{ form.create() }}
+</form>
+
+{% endblock %}

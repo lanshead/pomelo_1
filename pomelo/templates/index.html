@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    {{ super() }}
+    <details>
+        <summary>Текущие задачи
+            <a href="/add_task"><input type="submit" value="Добавить" /></a>
+        </summary>
+        <hr>
+        {% for task in actions[::-1] %}
+
+                {% if task.isactive %}
+                    <p>
+                        Наименование: {{ task.task_name }}<br>
+                        Отчет: {{ task.report_name }}<br>
+                        Время создания: {{ task.string_time_create }}<br>
+                        Выполняется каждые: {{ configs[task.task_name].time_interval }}<br>
+                        Начиная с: {{ configs[task.task_name].dt_begin }} в {{ configs[task.task_name].tm_begin }}<br>
+                        Заканчивая: {{ configs[task.task_name].dt_end }} в {{ configs[task.task_name].tm_end }}<br>
+                    </p>
+                    <form action="{{ task.report_name }}" method="get">
+                        <input type="text" name="{{ task.task_name }}" value="{{ task.task_name }}" hidden="">
+                        <button type="submit"> Выполнить сейчас {{ task.task_name }} </button>
+                    </form>
+                    </br>
+                    <hr>
+                {% endif %}
+
+        {% endfor %}
+    <a href="/all_tasks"><input type="submit" value="Все задачи" /></a>
+    </details>
+    <details>
+        <summary>Завершенные задачи</summary>
+        {% for task in actions %}
+            {% if not task.isactive %}
+                <p>
+                    Наименование: {{ task.task_name }}<br>
+                    Отчет: {{ task.report_name }}<br>
+                    Время создания: {{ task.time_create }}<br>
+                    Данные 1: {{ task.label1 }}<br>
+                    Данные2: {{ task.label2 }}<br>
+                </p>
+                <button value="">???Редактировать???</button></br>
+                <hr>
+            {% endif %}
+        {% endfor %}
+    </details>
+{% endblock %}

@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<link type="text/css" href="{{ url_for('static', filename='css/styles.css')}}" rel="stylesheet" />
+    {% block title -%}
+    <meta charset="UTF-8">
+    <title>POMELO</title>
+    {%  endblock %}
+</head>
+<body>
+    <div>
+        POMELO:
+        <a href="{{ url_for('index') }}">Главная</a>
+        <a href="{{ url_for('table_jobs') }}">Все плановые работы</a>
+        <a href="{{ url_for('jobs') }}">Действующие задания</a>
+        <!--<a href="{{ url_for('login') }}">Вход</a>-->
+        <a href="{{ url_for('logout') }}">Выход</a>
+    </div>
+        <hr>
+{% block content -%}
+<h1>{{ h1 }}</h1>
+{% endblock -%}
+</body>
+</html>
