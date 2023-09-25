@@ -67,9 +67,20 @@ class FDataBase:
             print("Ошибка чтения из БД " + str(e))
         return {}
 
-    def getConfigTest1(self, tsk_name):
+    def getConfigTest1(self, tsk_name): # выгрузка по ID в функции getIdConfigTest1
 
         sql = f'''SELECT configs FROM actions WHERE task_name="{tsk_name}"'''
+        try:
+            self.__cur.execute(sql)
+            res = self.__cur.fetchall()
+            return res
+        except sqlite3.Error as e:
+            print("Ошибка чтения из БД" + str(e))
+        return []
+
+    def getIdConfigTest1(self, tsk_id): # переработанная выгрузка (доп. выгружается имя задачи) по ID вместо вгрузки по названию в getConfigTest1
+
+        sql = f'''SELECT task_name, configs FROM actions WHERE id="{tsk_id}"'''
         try:
             self.__cur.execute(sql)
             res = self.__cur.fetchall()
@@ -109,6 +120,17 @@ class FDataBase:
             return res
         except sqlite3.Error as e:
             print("Ошибка чтения из БД" + str(e))
+        return []
+
+
+    def updateJob(self, id, for_update):
+        ''''''
+        sql = 'UPDATE actions SET configs = ? WHERE id = ?'
+        try:
+            self.__cur.execute(sql, (for_update, id))
+            self.__db.commit()
+        except sqlite3.Error as e:
+            print("Ошибка чтения из БД " + str(e))
         return []
 
 

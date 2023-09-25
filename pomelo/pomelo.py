@@ -5,7 +5,6 @@ import sqlite3
 import os
 import hashlib
 import json
-
 import flask
 from flask_apscheduler import APScheduler
 from sourcescript import compare_count_pos
@@ -13,8 +12,6 @@ from forms import ReportTest1
 from FDataBase import FDataBase
 from flask import Flask, render_template, request, flash, redirect, url_for, session, abort, g
 
-# from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
-# from obj_env.scheduler_configs import SchedulerConfigs
 
 count_test2 = 0  # for test
 DATABASE = '/tmp/flsk_website.db'
@@ -59,8 +56,7 @@ def scheduler_test2():
 
 def create_job_compare_count_pos(tsk_name):
     with app.app_context():
-        db = get_db()
-        dbase = FDataBase(db)
+        dbase = FDataBase(get_db())
         config = json.loads(dbase.getConfigTest1(tsk_name)[0]['configs'])
         job = compare_count_pos.compare_positions(user=config['user'],
                                                   usr_pass=config['usr_pass'],
@@ -74,54 +70,110 @@ def create_job_compare_count_pos(tsk_name):
 
 # забираем конфиг задания из БД
 def config_rep_test1(tsk_name):
-    db = get_db()
-    dbase = FDataBase(db)
+    dbase = FDataBase(get_db())
     return json.loads(dbase.getConfigTest1(tsk_name)[0][0])
 
 
 # >>>Навигация по сайту
 @app.route('/')
 def index():
-    if 'userLogged' not in session:
-        return render_template('login.html', h1='Авторизация')
-    db = get_db()
-    dbase = FDataBase(db)
+    # test_update_DB()
+    userLogged()
+    dbase = FDataBase(get_db())
     actions = dbase.fromActions()
     configs = {}
     for task in actions:
         configs[f'{task[1]}'] = json.loads(task[6])
     return render_template('index.html', h1='Задачи', actions=actions, configs=configs)
 
+
 @app.route('/table_jobs', methods=["POST", "GET"])
 def table_jobs():
-    if 'userLogged' not in session:
-        return render_template('login.html', h1='Авторизация')
-    db = get_db()
-    dbase = FDataBase(db)
+    userLogged()
+    dbase = FDataBase(get_db())
     jobs = dbase.tableJobs()
     return render_template('table_jobs.html', h1='TABLE JOBS', jobs=jobs)
 
 
-
 @app.route('/upload/<id>')
 def upload(id):
-    db = get_db()
-    dbase = pickle.loads(FDataBase(db).getBLOB(id)[0]['output'])
+    userLogged()
+    dbase = FDataBase(get_db())
+    loads = pickle.loads(dbase.getBLOB(id)[0]['output'])
     filename = f'uploads/CCP_id={id}_{datetime.datetime.now().strftime("%m_%d_%Y_%H_%M_%S")}.txt'
     with open(filename, 'w', encoding='utf-8') as f:
-        [f.write(str(temp)) for temp in dbase]
+        [f.write(str(temp)) for temp in loads]
         f.close()
     return flask.send_file(filename, as_attachment=True)
 
+
+@app.route('/edit_job/<id>', methods=["POST", "GET"])
+def edit_job(id):
+    userLogged()
+    dbase = FDataBase(get_db())
+    configs = dbase.getIdConfigTest1(id)  # выгружаем по ID из БД имя редактируемого джоба(активной задачи) и его конфиг
+    name = configs[0]['task_name']  # передаем имя в отдельную переменную
+    configs = json.loads(configs[0]['configs'])  # перезаписываем переменную в виде комфортного для работы dict
+    configs['time_interval']=datetime.datetime.strptime(configs['time_interval'], '%H:%M')
+    configs['tm_begin'] = datetime.datetime.strptime(configs['tm_begin'], '%H:%M')
+    configs['tm_end'] = datetime.datetime.strptime(configs['tm_end'], '%H:%M')
+    configs['dt_begin'] = datetime.datetime.strptime(configs['dt_begin'], '%Y-%m-%d')
+    configs['dt_end'] = datetime.datetime.strptime(configs['dt_end'], '%Y-%m-%d')
+    form = ReportTest1(data=configs)  # выгрузку из БД присваиваем к значениям по умолчанию формы
+    if form.validate_on_submit():
+        for_update = {'user': request.form['user'],
+                      'usr_pass': request.form['usr_pass'],
+                      'db_adress': request.form['db_adress'],
+                      'db_login': request.form['db_login'],
+                      'db_pass': request.form['db_pass'],
+                      'db_name': request.form['db_name'],
+                      'rp_descr': request.form['rp_descr'],
+                      'time_interval': request.form['time_interval'],
+                      'tm_begin': request.form['tm_begin'],
+                      'dt_begin': request.form['dt_begin'],
+                      'tm_end': request.form['tm_end'],
+                      'dt_end': request.form['dt_end']
+                      }
+        print(type(json.dumps(for_update)))
+        dbase.updateJob(int(id), json.dumps(for_update))
+        # готовим данные для cron из формы
+        # ПЕРЕРАБОТАТЬ В КЛАСС ИЛИ ФУНКЦИЮ
+        hour_interval, minute_interval = for_update['time_interval'].split(':')
+        hour_begin, minute_begin = for_update['tm_begin'].split(':')
+        year_begin, month_begin, day_begin = for_update['dt_begin'].split('-')
+        hour_end, minute_end = for_update['tm_end'].split(':')
+        year_end, month_end, day_end = for_update['dt_end'].split('-')
+
+        if int(hour_interval) == 0:
+            for_hour_cron = f'{hour_begin}-{hour_end}'
+        else:
+            for_hour_cron = f'{hour_begin}-{hour_end}/{hour_interval}'
+        if int(minute_interval) == 0:
+            for_minute_cron = f'{minute_begin}-{minute_end}'
+        else:
+            for_minute_cron = f'{minute_begin}-{minute_end}/{minute_interval}'
+        # добавляем job из формы
+        task_name = name
+        scheduler.modify_job(id=f'job_{name}', func=create_job_compare_count_pos,
+                             args=(name,),
+                             trigger='cron',
+                             year=f'{year_begin}-{year_end}',
+                             month=f'{month_begin}-{month_end}',
+                             day=f'{day_begin}-{day_end}',
+                             hour=for_hour_cron,
+                             minute=for_minute_cron)
+        print(scheduler.get_jobs())
+        return redirect(url_for('index'))
+
+    return render_template('edit_job.html', h1='EDIT JOB', form=form, name=name, configs=configs) # config по идее не нужен
 
 
 @app.route('/login', methods=["POST", "GET"])
 def login():
     if 'userLogged' in session:
-        return redirect(url_for('profile', username=session['userLogged']))
+        return redirect(url_for('index', username=session['userLogged']))
     elif request.method == 'POST':
-        db = get_db()  # коннект к базе
-        dbase = FDataBase(db).getLogPass(
+        dbase = FDataBase(get_db()).getLogPass(
             request.form['username'])  # получение из базы значения пользователя и его хеш-пароля в виде [dict()]
         if dbase:  # eсли dbase нашла пользователя
             if hashlib.scrypt(request.form['pass'].encode(), salt='mysalt'.encode(), n=8, r=512, p=4, dklen=32).hex() == \
@@ -140,12 +192,11 @@ def login():
 def addTask():
     '''Рендерит страницу для указания наименования и выбора отчета. При нажатии кнопки "Далее" редиректит на
     страницу соответствующую отчета для заполнения дополнительных параметров'''
-    if 'userLogged' not in session:
-        abort(401)
-    db = get_db()
-    dbase = FDataBase(db)
+    userLogged()
+    dbase = FDataBase(get_db())
     if request.method == "POST":
-        if not dbase.chekTaskName(request.form['task_name']) and len(request.form['task_name']) > 4 and request.form['report_name'] == 'test1':
+        if not dbase.chekTaskName(request.form['task_name']) and len(request.form['task_name']) > 4 and request.form[
+            'report_name'] == 'test1':
             session['task_name'] = request.form['task_name']  # сохраняем в сессии имя отчета
             return redirect(url_for('report_for_test1'))
         else:
@@ -156,11 +207,8 @@ def addTask():
 @app.route('/report_for_test1', methods=['GET', 'POST'])
 def report_for_test1():
     '''Заполнение данных для конкретного отчета.'''
-    if 'userLogged' not in session:
-        abort(401)
-
-    db = get_db()
-    dbase = FDataBase(db)
+    userLogged()
+    dbase = FDataBase(get_db())
     form = ReportTest1()
     if form.validate_on_submit():
         configs = {'user': request.form['user'],
@@ -169,6 +217,7 @@ def report_for_test1():
                    'db_login': request.form['db_login'],
                    'db_pass': request.form['db_pass'],
                    'db_name': request.form['db_name'],
+                   'rp_descr': request.form['rp_descr'],
                    'time_interval': request.form['time_interval'],
                    'tm_begin': request.form['tm_begin'],
                    'dt_begin': request.form['dt_begin'],
@@ -178,6 +227,7 @@ def report_for_test1():
         dbase.addTask(session['task_name'], 'test1', 'compare_count_pos.py', json.dumps(configs), isactive=1,
                       descript=request.form['rp_descr'])
         # готовим данные для cron из формы
+        # ПЕРЕРАБОТАТЬ В КЛАСС ИЛИ ФУНКЦИЮ
         hour_interval, minute_interval = configs['time_interval'].split(':')
         hour_begin, minute_begin = configs['tm_begin'].split(':')
         year_begin, month_begin, day_begin = configs['dt_begin'].split('-')
@@ -210,10 +260,8 @@ def report_for_test1():
 
 @app.route('/test1', methods=['GET', 'POST'])
 def create_now():
-    if 'userLogged' not in session:
-        abort(401)
-    db = get_db()
-    dbase = FDataBase(db)
+    userLogged()
+    dbase = FDataBase(get_db())
     tsk_name = [v for v in request.args.values()][0]
     config = json.loads(dbase.getConfigTest1(tsk_name)[0]['configs'])
     job = compare_count_pos.compare_positions(user=config['user'],
@@ -228,35 +276,16 @@ def create_now():
 
 @app.route('/jobs', methods=["POST", "GET"])
 def jobs():
-    if 'userLogged' not in session:
-        abort(401)
+    userLogged()
     if request.method == 'POST':
         scheduler.delete_job(request.form['id'])
-        db = connect_db()
-        dbase = FDataBase(db)
+        dbase = FDataBase(connect_db())
         dbase.deactiveJob(request.form['id'])
 
     j = scheduler.get_jobs()
-    return render_template('jobs.html', h1='Действующие задания', jobs= j)
+    return render_template('jobs.html', h1='Действующие задания', jobs=j)
 
 
-@app.route("/profile/<username>")
-def profile(username):
-    if 'userLogged' not in session or session['userLogged'] != username:
-        abort(401)
-    db = get_db()
-    dbase = FDataBase(db)
-    return render_template('index.html', h1='Задачи', actions=dbase.fromActions())
-
-
-@app.route("/logout")
-def logout():
-    if 'userLogged' in session:
-        session.clear()
-    abort(401)
-
-
-# >>>Взаимодействие с БД
 def connect_db():
     conn = sqlite3.connect(app.config['DATABASE'])
     conn.row_factory = sqlite3.Row
@@ -285,6 +314,14 @@ def close_db(error):
     if hasattr(g, 'link_db'):
         g.link_db.close()
 
+@app.route("/logout")
+def logout():
+    if 'userLogged' in session:
+        session.clear()
+    abort(401)
+
+def userLogged():
+    return True if 'userLogged' in session else abort(401)
 
 # >>>Обработки ошибок
 @app.errorhandler(404)
@@ -305,4 +342,3 @@ if __name__ == '__main__':
     scheduler.start()
     app.run(
         debug=True)  # use_reloader позволяет выполнить задачу без дублей ( при необходимости см. описание параметра)
-

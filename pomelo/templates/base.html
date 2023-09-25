@@ -9,7 +9,7 @@
 </head>
 <body>
     <div>
-        POMELO:
+        POMELO (Вы вошли как: {{session['userLogged']}}):
         <a href="{{ url_for('index') }}">Главная</a>
         <a href="{{ url_for('table_jobs') }}">Все плановые работы</a>
         <a href="{{ url_for('jobs') }}">Действующие задания</a>

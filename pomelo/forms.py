@@ -18,4 +18,7 @@ class ReportTest1(FlaskForm):
     dt_begin = DateTimeField('Начиная с: ', validators=[Optional()], format='%Y-%m-%d', widget=DateInput())
     dt_end = DateTimeField('Заканчивая: ', validators=[Optional()], format='%Y-%m-%d', widget=DateInput())
     create = SubmitField('Создать задачу')
+    edit = SubmitField('Применить изменения')
+
+
 

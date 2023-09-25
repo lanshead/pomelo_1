@@ -22,12 +22,13 @@
                         <input type="text" name="{{ task.task_name }}" value="{{ task.task_name }}" hidden="">
                         <button type="submit"> Выполнить сейчас {{ task.task_name }} </button>
                     </form>
+                    <a href="/edit_job/{{ task.id }}"><input type="submit" value="Edit" /></a>
                     </br>
                     <hr>
                 {% endif %}
 
         {% endfor %}
-    <a href="/all_tasks"><input type="submit" value="Все задачи" /></a>
+    <a href="{{ url_for('table_jobs')}}"><input type="submit" value="Все задачи" /></a>
     </details>
     <details>
         <summary>Завершенные задачи</summary>
