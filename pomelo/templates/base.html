@@ -8,17 +8,20 @@
     {%  endblock %}
 </head>
 <body>
-    <div>
-        POMELO (Вы вошли как: {{session['userLogged']}}):
+    <div class="header">
+        <p><div class="logo">POMELO (Вы вошли как: {{session['userLogged']}}):</div>
         <a href="{{ url_for('index') }}">Главная</a>
         <a href="{{ url_for('table_jobs') }}">Все плановые работы</a>
         <a href="{{ url_for('jobs') }}">Действующие задания</a>
         <!--<a href="{{ url_for('login') }}">Вход</a>-->
-        <a href="{{ url_for('logout') }}">Выход</a>
+        <a href="{{ url_for('logout') }}" class="last">Выход</a>
+        </p>
     </div>
-        <hr>
+    <div class="clear"></div>
+    <div class="content">
 {% block content -%}
 <h1>{{ h1 }}</h1>
 {% endblock -%}
+    </div>
 </body>
 </html>

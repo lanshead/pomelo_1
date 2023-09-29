@@ -1,10 +1,10 @@
 {% extends 'base.html' %}
-
 {% block content %}
     {{ super() }}
+    <div class="cntnt">
     <details>
         <summary>Текущие задачи
-            <a href="/add_task"><input type="submit" value="Добавить" /></a>
+            <a href="/add_task"><input type="submit" value="Добавить" class="sbmt"/></a>
         </summary>
         <hr>
         {% for task in actions[::-1] %}
@@ -20,15 +20,15 @@
                     </p>
                     <form action="{{ task.report_name }}" method="get">
                         <input type="text" name="{{ task.task_name }}" value="{{ task.task_name }}" hidden="">
-                        <button type="submit"> Выполнить сейчас {{ task.task_name }} </button>
+                        <button type="submit" class="sbmt"> Выполнить сейчас {{ task.task_name }} </button>
                     </form>
-                    <a href="/edit_job/{{ task.id }}"><input type="submit" value="Edit" /></a>
+                    <a href="/edit_job/{{ task.id }}"><input type="submit" value="Edit" class="sbmt"/></a>
                     </br>
                     <hr>
                 {% endif %}
 
         {% endfor %}
-    <a href="{{ url_for('table_jobs')}}"><input type="submit" value="Все задачи" /></a>
+    <a href="{{ url_for('table_jobs')}}"><input type="submit" value="Все задачи" class="sbmt"/></a>
     </details>
     <details>
         <summary>Завершенные задачи</summary>
@@ -41,9 +41,10 @@
                     Данные 1: {{ task.label1 }}<br>
                     Данные2: {{ task.label2 }}<br>
                 </p>
-                <button value="">???Редактировать???</button></br>
+                <button value="" class="sbmt">???Редактировать???</button></br>
                 <hr>
             {% endif %}
         {% endfor %}
     </details>
+    </div>
 {% endblock %}

@@ -2,6 +2,7 @@
 
 {% block content %}
     {{ super() }}
+<div class="cntnt">
 <table>
     <colgroup>
         <col>
@@ -23,11 +24,11 @@
         <td>{{  temp.task_name  }}</td>
         <td>{{  temp.job_time  }}</td>
         <td>{{  temp.warning_obj  }}</td>
-        <td> <a href="/upload/{{temp.id}}"><input type="submit" value="download" /></a></td>
+        <td> <a href="/upload/{{temp.id}}"><input type="submit" value="download" class="sbmt"/></a></td>
     </tr>
     {% endfor %}
 </table>
-
+</div>
 
 
 

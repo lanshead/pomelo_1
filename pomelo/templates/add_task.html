@@ -5,7 +5,7 @@
 {% for cat, msg in get_flashed_messages(True) %}
     <div class="flash {{ cat }}">{{ msg }}</div>
 {% endfor %}
-
+<div class="cntnt">
 <form id='Form' action="{{ url_for('addTask') }}" method="post" class="form-contact">
 <p><label>Название задания: </label><input type="text" name="task_name" value="" required />
 <!-- Выбор отчета. Наименования выгружаются из БД -->
@@ -15,12 +15,13 @@
     <option>{{ obj.filename }}</option>
     {% endfor %}
 </select>
+</p>
 
 <!--<div id="includeContent"></div> -->
 
-<p><input type="submit" value="Далее" />
+<input type="submit" value="Далее" class="sbmt"/>
 </form>
-
+</div>
 <!-- Серия if/else JS-скрипта, отображающий блоки в зависимости от заполняемых полей отчета, действия и времени -->
 <!--- <script type="text/javascript">
     Form.report_name.addEventListener('change', function(e) {

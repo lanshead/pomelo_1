@@ -2,11 +2,13 @@
 
 {% block content %}
     {{ super() }}
+<div class="cntnt">
     {% for job in jobs %}
     <p style="text-align-all: right">{{job.id}}, {{job.trigger}}}
         <form action="" method="post">
         <input type="text" name="id" value="{{job.id}}" hidden="">
-        <button type="submit"> Удалить {{job.id}} </button>
+        <button type="submit" class="sbmt"> Удалить {{job.id}} </button>
         </form></p>
     {% endfor %}
+</div>
 {% endblock %}

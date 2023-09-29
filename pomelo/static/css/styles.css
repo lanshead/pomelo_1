@@ -16,3 +16,132 @@ td, th {
 }
 col { border-left: 4px double #333; }
 col:first-child { border-left-width: 1px; }
+
+html, body {
+    font-family: 'Arial';
+    background: #FFE5DC;
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    width: 100%;
+}
+h1{
+    margin: 0;
+    padding: 5px 0 5px 5px;
+}
+
+a{
+    color: #284d00;
+    text-decoration: #4d0026;
+}
+
+a:hover{
+    color: #4d0026;
+    text-decoration: underline;
+}
+
+div.header{
+    list-style: none;
+    background: #A72E02;
+    height: 60px;
+    margin: 0 ;
+    padding: 0 40px 0 40px;
+    color: #FFE5DC;
+    font-size: 20px;
+    overflow: hidden;
+}
+
+div.header div.logo{
+    display: inline-block;
+    color: #341509;
+}
+
+div.header a{
+    color: #FFE5DC;
+    text-decoration: none;
+    background-color: #FD4F0F;
+    margin: 0 0 0 0;
+    padding: 20px 5px 18px 5px;
+}
+
+div.header a:hover{
+    color: #341509;
+    background-color: #a3a3c2;
+}
+
+div.header a.last{
+    float: right;
+    padding: 20px;
+    margin: -20px 0 10px 10px;
+
+}
+
+.clear{clear: both;}
+
+div.content{
+    list-style: none;
+    background: #FFE5DC;
+    color: #4d0026;
+    margin: 0 0 0 0;
+    padding: 0 0 0 0;
+}
+div.content>details{
+    padding-left: 15px;
+}
+
+div.cntnt{
+    width: 95%;
+    margin: 20px auto 0 auto;
+    padding: 10px;
+    background: #ED7245;
+    box-shadow: 5px 5px 10px #aaa;
+}
+
+label{
+    display: inline-block;
+    min-width: 150px;
+}
+form.form-contact p{
+    margin: 10px;
+}
+form.form-contact p>label{
+    font-size: 16px;
+}
+form.form-contact p>input{
+    width: 250px;
+    background: #ED7245;
+    border: none;
+    border-bottom: 1px solid #341509;
+    font-size: 16px;
+}
+
+form.form-contact p>input:focus{
+    background: #a3a3c2;
+    color: #341509;
+}
+
+textarea{
+    background-color: #ED7245;
+    border-color: #341509;
+    min-width: 250px;
+    min-height: 50px;
+}
+
+textarea:focus{
+    background: #a3a3c2;
+    color: #341509;
+}
+
+.sbmt{
+    background: #FD4F0F;
+    color: #341509;
+    padding: 5px;
+    border: 1px solid #341509;
+    border-radius: 3px;
+}
+
+.sbmt:hover{
+    background:#a3a3c2;
+    cursor: pointer;
+}
+
